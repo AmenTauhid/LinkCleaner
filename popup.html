@@ -6,14 +6,24 @@
 </head>
 <body>
   <div class="popup">
-    <div class="row">
+    <div class="header">
       <span class="title">Link Cleaner</span>
       <label class="toggle">
         <input type="checkbox" id="toggle" checked>
         <span class="track"></span>
       </label>
     </div>
-    <span class="hint" id="status">On</span>
+
+    <div class="status-bar" id="status-bar">
+      <span class="dot" id="dot"></span>
+      <span id="status-text">Cleaning links</span>
+    </div>
+
+    <div class="current" id="current" hidden>
+      <div class="current-label">This page</div>
+      <div class="current-url" id="current-url"></div>
+      <button class="copy-btn" id="copy-btn">Copy clean URL</button>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>
