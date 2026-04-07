@@ -13,15 +13,6 @@ const TRACKING_PARAMS = [
   "vero_id", "nr_email_referer", "mkt_tok"
 ];
 
-const recentCleans = new Map();
-let isEnabled = true;
-
-// Keep enabled state cached in memory so listeners stay synchronous
-chrome.storage.local.get({ enabled: true }, ({ enabled }) => { isEnabled = enabled; });
-chrome.storage.onChanged.addListener((changes) => {
-  if (changes.enabled) isEnabled = changes.enabled.newValue;
-});
-
 // ─── Setup ───
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -34,43 +25,6 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ["link", "page"]
   });
 });
-
-// ─── Badge counter ───
-// Fully synchronous — no awaits, so the redirect's second onBeforeNavigate
-// can't race and clear the badge before we set it.
-
-chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (details.frameId !== 0) return;
-
-  // Skip the redirect's second fire
-  const recent = recentCleans.get(details.tabId);
-  if (recent && Date.now() - recent < 3000) return;
-
-  if (!isEnabled) return;
-
-  try {
-    const url = new URL(details.url);
-    let count = 0;
-    for (const p of TRACKING_PARAMS) {
-      if (url.searchParams.has(p)) count++;
-    }
-    if (count === 0) return;
-
-    // Mark immediately so the redirect's onBeforeNavigate is blocked
-    recentCleans.set(details.tabId, Date.now());
-
-    // Set badge synchronously
-    chrome.action.setBadgeText({ text: String(count), tabId: details.tabId });
-    chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
-
-    // Persist total (fire and forget)
-    chrome.storage.local.get({ totalCleaned: 0 }, ({ totalCleaned }) => {
-      chrome.storage.local.set({ totalCleaned: totalCleaned + count });
-    });
-  } catch {}
-});
-
-chrome.tabs.onRemoved.addListener((tabId) => recentCleans.delete(tabId));
 
 // ─── Context menu ───
 
@@ -113,7 +67,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.storage.local.set({ enabled: msg.enabled });
   }
   if (msg.action === "getStatus") {
-    chrome.storage.local.get({ enabled: true, totalCleaned: 0 }, sendResponse);
+    chrome.storage.local.get({ enabled: true }, sendResponse);
     return true;
   }
 });

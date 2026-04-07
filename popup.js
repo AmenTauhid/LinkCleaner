@@ -15,20 +15,16 @@ const TRACKING_PARAMS = [
 
 const power = document.getElementById("power");
 const domainEl = document.getElementById("domain");
-const pageCount = document.getElementById("page-count");
-const totalCount = document.getElementById("total-count");
 const copyBtn = document.getElementById("copy-btn");
 const copyText = document.getElementById("copy-text");
 
 let enabled = true;
 let cleanUrl = null;
-let pageCleanCount = 0;
 
 // Load state
 chrome.runtime.sendMessage({ action: "getStatus" }, (res) => {
   if (!res) return;
   enabled = res.enabled;
-  totalCount.textContent = res.totalCleaned || 0;
   updatePower();
 });
 
@@ -41,14 +37,11 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const url = new URL(raw);
     domainEl.textContent = url.hostname;
 
+    let dirty = false;
     for (const p of TRACKING_PARAMS) {
-      if (url.searchParams.has(p)) {
-        pageCleanCount++;
-        url.searchParams.delete(p);
-      }
+      if (url.searchParams.has(p)) { dirty = true; url.searchParams.delete(p); }
     }
-    if (pageCleanCount > 0) cleanUrl = url.toString();
-    pageCount.textContent = pageCleanCount;
+    if (dirty) cleanUrl = url.toString();
   } catch {
     domainEl.textContent = "---";
   }
@@ -75,5 +68,4 @@ copyBtn.addEventListener("click", () => {
 
 function updatePower() {
   power.classList.toggle("off", !enabled);
-  document.body.classList.toggle("off", !enabled);
 }

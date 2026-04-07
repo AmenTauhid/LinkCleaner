@@ -68,38 +68,6 @@ body {
   background: #555;
 }
 
-/* Stats row */
-.stats {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px 16px;
-  gap: 16px;
-}
-
-.stat { text-align: center; }
-
-.stat-num {
-  display: block;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a8cff;
-}
-
-.power.off ~ .stats .stat-num,
-body.off .stat-num { color: #666; }
-
-.stat-label {
-  font-size: 10px;
-  color: #555;
-}
-
-.stat-sep {
-  width: 1px;
-  height: 28px;
-  background: #2a2a40;
-}
-
 /* Bottom toolbar */
 .toolbar {
   border-top: 1px solid #2a2a40;

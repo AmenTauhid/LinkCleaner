@@ -7,7 +7,6 @@
     "declarativeNetRequest",
     "storage",
     "contextMenus",
-    "webNavigation",
     "activeTab",
     "scripting"
   ],
