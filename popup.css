@@ -15,9 +15,20 @@ body {
   border-bottom: 1px solid #2a2a40;
 }
 
-.domain-bar span {
+.brand {
   font-size: 12px;
-  color: #888;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.domain-sep {
+  font-size: 10px;
+  color: #444;
+}
+
+#domain {
+  font-size: 11px;
+  color: #666;
   user-select: all;
 }
 
