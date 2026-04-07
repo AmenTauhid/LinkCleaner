@@ -1,0 +1,43 @@
+#link-cleaner-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  border-radius: 10px;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+
+#link-cleaner-toast.lc-toast-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#link-cleaner-toast.lc-toast-hide {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.lc-toast-icon {
+  color: #4caf50;
+  font-size: 16px;
+}
+
+@media (prefers-color-scheme: light) {
+  #link-cleaner-toast {
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+}
