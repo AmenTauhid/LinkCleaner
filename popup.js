@@ -13,20 +13,23 @@ const TRACKING_PARAMS = [
   "vero_id", "nr_email_referer", "mkt_tok"
 ];
 
-const toggle = document.getElementById("toggle");
-const dot = document.getElementById("dot");
-const statusText = document.getElementById("status-text");
-const currentSection = document.getElementById("current");
-const currentUrl = document.getElementById("current-url");
+const power = document.getElementById("power");
+const domainEl = document.getElementById("domain");
+const pageCount = document.getElementById("page-count");
+const totalCount = document.getElementById("total-count");
 const copyBtn = document.getElementById("copy-btn");
+const copyText = document.getElementById("copy-text");
 
+let enabled = true;
 let cleanUrl = null;
+let pageCleanCount = 0;
 
 // Load state
 chrome.runtime.sendMessage({ action: "getStatus" }, (res) => {
   if (!res) return;
-  toggle.checked = res.enabled;
-  updateStatus(res.enabled);
+  enabled = res.enabled;
+  totalCount.textContent = res.totalCleaned || 0;
+  updatePower();
 });
 
 // Check current tab
@@ -36,38 +39,41 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 
   try {
     const url = new URL(raw);
-    let dirty = false;
+    domainEl.textContent = url.hostname;
+
     for (const p of TRACKING_PARAMS) {
-      if (url.searchParams.has(p)) { dirty = true; url.searchParams.delete(p); }
+      if (url.searchParams.has(p)) {
+        pageCleanCount++;
+        url.searchParams.delete(p);
+      }
     }
-    if (dirty) {
-      cleanUrl = url.toString();
-      currentUrl.textContent = cleanUrl;
-      currentSection.hidden = false;
-    }
-  } catch {}
+    if (pageCleanCount > 0) cleanUrl = url.toString();
+    pageCount.textContent = pageCleanCount;
+  } catch {
+    domainEl.textContent = "---";
+  }
 });
 
-// Toggle
-toggle.addEventListener("change", () => {
-  const enabled = toggle.checked;
-  updateStatus(enabled);
+// Power toggle
+power.addEventListener("click", () => {
+  enabled = !enabled;
+  updatePower();
   chrome.runtime.sendMessage({ action: "toggle", enabled });
 });
 
-// Copy
+// Copy clean URL
 copyBtn.addEventListener("click", () => {
   if (!cleanUrl) return;
   navigator.clipboard.writeText(cleanUrl);
-  copyBtn.textContent = "Copied";
+  copyText.textContent = "Copied";
   copyBtn.classList.add("done");
   setTimeout(() => {
-    copyBtn.textContent = "Copy clean URL";
+    copyText.textContent = "Copy clean URL";
     copyBtn.classList.remove("done");
   }, 1500);
 });
 
-function updateStatus(enabled) {
-  dot.classList.toggle("off", !enabled);
-  statusText.textContent = enabled ? "Cleaning links" : "Paused";
+function updatePower() {
+  power.classList.toggle("off", !enabled);
+  document.body.classList.toggle("off", !enabled);
 }

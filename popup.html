@@ -6,23 +6,39 @@
 </head>
 <body>
   <div class="popup">
-    <div class="header">
-      <span class="title">Link Cleaner</span>
-      <label class="toggle">
-        <input type="checkbox" id="toggle" checked>
-        <span class="track"></span>
-      </label>
+    <div class="domain-bar">
+      <span id="domain">---</span>
     </div>
 
-    <div class="status-bar" id="status-bar">
-      <span class="dot" id="dot"></span>
-      <span id="status-text">Cleaning links</span>
+    <div class="main">
+      <button class="power" id="power">
+        <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 3v8"/>
+          <path d="M5.6 6.6a9 9 0 1 0 12.8 0"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="current" id="current" hidden>
-      <div class="current-label">This page</div>
-      <div class="current-url" id="current-url"></div>
-      <button class="copy-btn" id="copy-btn">Copy clean URL</button>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-num" id="page-count">0</span>
+        <span class="stat-label">this page</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <span class="stat-num" id="total-count">0</span>
+        <span class="stat-label">since install</span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="tool-btn" id="copy-btn" title="Copy clean URL">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <span id="copy-text">Copy clean URL</span>
+      </button>
     </div>
   </div>
   <script src="popup.js"></script>

@@ -52,6 +52,10 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     recentCleans.set(details.tabId, Date.now());
     chrome.action.setBadgeText({ text: String(count), tabId: details.tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
+
+    // Persist total
+    const { totalCleaned = 0 } = await chrome.storage.local.get({ totalCleaned: 0 });
+    chrome.storage.local.set({ totalCleaned: totalCleaned + count });
   } catch {}
 });
 
@@ -98,7 +102,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.storage.local.set({ enabled: msg.enabled });
   }
   if (msg.action === "getStatus") {
-    chrome.storage.local.get({ enabled: true }, sendResponse);
+    chrome.storage.local.get({ enabled: true, totalCleaned: 0 }, sendResponse);
     return true;
   }
 });

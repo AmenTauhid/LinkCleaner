@@ -2,116 +2,115 @@
 
 body {
   font-family: "Segoe UI", system-ui, sans-serif;
-  width: 260px;
-  background: #1c1c1c;
+  width: 230px;
+  background: #1b1b2f;
   color: #ccc;
 }
 
-.popup { padding: 14px; }
-
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+/* Domain bar */
+.domain-bar {
+  padding: 6px 12px;
+  background: #141425;
+  text-align: center;
+  border-bottom: 1px solid #2a2a40;
 }
 
-.title {
-  font-size: 13px;
-  font-weight: 600;
+.domain-bar span {
+  font-size: 12px;
+  color: #888;
+  user-select: all;
+}
+
+/* Main power area */
+.main {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0 16px;
+}
+
+.power {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: #1446a0;
   color: #fff;
-}
-
-/* Toggle */
-.toggle {
-  position: relative;
-  width: 34px;
-  height: 18px;
-}
-
-.toggle input { display: none; }
-
-.track {
-  position: absolute;
-  inset: 0;
-  background: #444;
-  border-radius: 18px;
   cursor: pointer;
-  transition: background 0.2s;
-}
-
-.track::before {
-  content: "";
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  left: 3px;
-  top: 3px;
-  background: #fff;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-
-input:checked + .track { background: #3b82f6; }
-input:checked + .track::before { transform: translateX(16px); }
-
-/* Status */
-.status-bar {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 11px;
-  color: #777;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #2a2a2a;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 16px rgba(20, 70, 160, 0.4);
 }
 
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #3b82f6;
-  flex-shrink: 0;
+.power:hover {
+  background: #1a56c4;
+  box-shadow: 0 0 22px rgba(20, 70, 160, 0.6);
 }
 
-.dot.off { background: #555; }
-
-/* Current page section */
-.current {
-  padding-top: 10px;
+.power.off {
+  background: #444;
+  box-shadow: none;
 }
 
-.current-label {
+.power.off:hover {
+  background: #555;
+}
+
+/* Stats row */
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px 16px;
+  gap: 16px;
+}
+
+.stat { text-align: center; }
+
+.stat-num {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a8cff;
+}
+
+.power.off ~ .stats .stat-num,
+body.off .stat-num { color: #666; }
+
+.stat-label {
   font-size: 10px;
   color: #555;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 5px;
 }
 
-.current-url {
-  font-size: 11px;
-  color: #999;
-  word-break: break-all;
-  line-height: 1.4;
-  margin-bottom: 8px;
-  max-height: 48px;
-  overflow: hidden;
+.stat-sep {
+  width: 1px;
+  height: 28px;
+  background: #2a2a40;
 }
 
-.copy-btn {
-  width: 100%;
-  padding: 7px;
-  background: #2a2a2a;
-  color: #ccc;
-  border: 1px solid #333;
-  border-radius: 6px;
+/* Bottom toolbar */
+.toolbar {
+  border-top: 1px solid #2a2a40;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.tool-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #666;
   font-size: 11px;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
 }
 
-.copy-btn:hover { background: #333; }
-.copy-btn.done { color: #3b82f6; border-color: #3b82f6; }
+.tool-btn:hover { color: #aaa; background: #222238; }
+.tool-btn.done { color: #1a8cff; }
