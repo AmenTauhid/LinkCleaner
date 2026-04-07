@@ -1,0 +1,54 @@
+{
+  "extName": { "message": "Link Cleaner" },
+  "extDescription": { "message": "Elimina autom\u00e1ticamente los par\u00e1metros de seguimiento (UTM, fbclid, gclid, etc.) de las URL." },
+
+  "statusActive": { "message": "Activo" },
+  "statusPaused": { "message": "Pausado" },
+  "session": { "message": "Sesi\u00f3n" },
+  "total": { "message": "Total" },
+  "cleanCurrent": { "message": "Limpiar URL actual" },
+  "copied": { "message": "\u00a1Copiado!" },
+  "alreadyClean": { "message": "\u00a1Ya est\u00e1 limpia!" },
+  "settings": { "message": "Configuraci\u00f3n" },
+
+  "contextMenuCopyClean": { "message": "Copiar URL limpia" },
+  "contextMenuCopyCleanCurrent": { "message": "Copiar URL limpia de la p\u00e1gina" },
+  "copiedToClipboard": { "message": "\u00a1URL limpia copiada!" },
+
+  "optionsTitle": { "message": "Configuraci\u00f3n de Link Cleaner" },
+  "optionsSubtitle": { "message": "Gestionar la eliminaci\u00f3n de par\u00e1metros de seguimiento" },
+
+  "statsTitle": { "message": "Estad\u00edsticas" },
+  "statsTotal": { "message": "Total eliminado" },
+  "statsSession": { "message": "Esta sesi\u00f3n" },
+  "statsDomains": { "message": "Dominios limpiados" },
+  "statsTopDomains": { "message": "Principales dominios" },
+  "statsEmpty": { "message": "Sin datos a\u00fan" },
+  "statsReset": { "message": "Restablecer estad\u00edsticas" },
+
+  "customParamsTitle": { "message": "Par\u00e1metros personalizados" },
+  "customParamsDesc": { "message": "Agregar par\u00e1metros de seguimiento adicionales para eliminar." },
+  "defaultParamsTitle": { "message": "Par\u00e1metros predeterminados (integrados)" },
+  "add": { "message": "Agregar" },
+
+  "whitelistTitle": { "message": "Dominios en lista blanca" },
+  "whitelistDesc": { "message": "Los par\u00e1metros de seguimiento no se eliminar\u00e1n en estos dominios." },
+
+  "notificationsTitle": { "message": "Notificaciones" },
+  "notificationsEnable": { "message": "Mostrar notificaciones" },
+  "notificationType": { "message": "Tipo de notificaci\u00f3n" },
+  "notifBadge": { "message": "Solo insignia" },
+  "notifToast": { "message": "Solo toast" },
+  "notifBoth": { "message": "Insignia + Toast" },
+
+  "themeTitle": { "message": "Apariencia" },
+  "themeLabel": { "message": "Tema" },
+  "themeSystem": { "message": "Sistema" },
+  "themeDark": { "message": "Oscuro" },
+  "themeLight": { "message": "Claro" },
+
+  "importExportTitle": { "message": "Importar / Exportar" },
+  "importExportDesc": { "message": "Respaldar o restaurar su configuraci\u00f3n." },
+  "exportBtn": { "message": "Exportar configuraci\u00f3n" },
+  "importBtn": { "message": "Importar configuraci\u00f3n" }
+}

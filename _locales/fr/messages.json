@@ -1,0 +1,54 @@
+{
+  "extName": { "message": "Link Cleaner" },
+  "extDescription": { "message": "Supprime automatiquement les param\u00e8tres de suivi (UTM, fbclid, gclid, etc.) des URL." },
+
+  "statusActive": { "message": "Actif" },
+  "statusPaused": { "message": "En pause" },
+  "session": { "message": "Session" },
+  "total": { "message": "Total" },
+  "cleanCurrent": { "message": "Nettoyer l'URL actuelle" },
+  "copied": { "message": "Copi\u00e9 !" },
+  "alreadyClean": { "message": "D\u00e9j\u00e0 propre !" },
+  "settings": { "message": "Param\u00e8tres" },
+
+  "contextMenuCopyClean": { "message": "Copier l'URL nettoy\u00e9e" },
+  "contextMenuCopyCleanCurrent": { "message": "Copier l'URL de la page nettoy\u00e9e" },
+  "copiedToClipboard": { "message": "URL nettoy\u00e9e copi\u00e9e !" },
+
+  "optionsTitle": { "message": "Param\u00e8tres de Link Cleaner" },
+  "optionsSubtitle": { "message": "G\u00e9rer la suppression des param\u00e8tres de suivi" },
+
+  "statsTitle": { "message": "Statistiques" },
+  "statsTotal": { "message": "Total supprim\u00e9" },
+  "statsSession": { "message": "Cette session" },
+  "statsDomains": { "message": "Domaines nettoy\u00e9s" },
+  "statsTopDomains": { "message": "Top domaines" },
+  "statsEmpty": { "message": "Aucune donn\u00e9e" },
+  "statsReset": { "message": "R\u00e9initialiser les statistiques" },
+
+  "customParamsTitle": { "message": "Param\u00e8tres personnalis\u00e9s" },
+  "customParamsDesc": { "message": "Ajouter des param\u00e8tres de suivi suppl\u00e9mentaires \u00e0 supprimer." },
+  "defaultParamsTitle": { "message": "Param\u00e8tres par d\u00e9faut (int\u00e9gr\u00e9s)" },
+  "add": { "message": "Ajouter" },
+
+  "whitelistTitle": { "message": "Domaines en liste blanche" },
+  "whitelistDesc": { "message": "Les param\u00e8tres de suivi ne seront pas supprim\u00e9s sur ces domaines." },
+
+  "notificationsTitle": { "message": "Notifications" },
+  "notificationsEnable": { "message": "Afficher les notifications" },
+  "notificationType": { "message": "Type de notification" },
+  "notifBadge": { "message": "Badge uniquement" },
+  "notifToast": { "message": "Toast uniquement" },
+  "notifBoth": { "message": "Badge + Toast" },
+
+  "themeTitle": { "message": "Apparence" },
+  "themeLabel": { "message": "Th\u00e8me" },
+  "themeSystem": { "message": "Syst\u00e8me" },
+  "themeDark": { "message": "Sombre" },
+  "themeLight": { "message": "Clair" },
+
+  "importExportTitle": { "message": "Importer / Exporter" },
+  "importExportDesc": { "message": "Sauvegarder ou restaurer vos param\u00e8tres." },
+  "exportBtn": { "message": "Exporter les param\u00e8tres" },
+  "importBtn": { "message": "Importer les param\u00e8tres" }
+}

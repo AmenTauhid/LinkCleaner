@@ -1,0 +1,54 @@
+{
+  "extName": { "message": "Link Cleaner" },
+  "extDescription": { "message": "Remove automaticamente par\u00e2metros de rastreamento (UTM, fbclid, gclid, etc.) das URLs." },
+
+  "statusActive": { "message": "Ativo" },
+  "statusPaused": { "message": "Pausado" },
+  "session": { "message": "Sess\u00e3o" },
+  "total": { "message": "Total" },
+  "cleanCurrent": { "message": "Limpar URL atual" },
+  "copied": { "message": "Copiado!" },
+  "alreadyClean": { "message": "J\u00e1 est\u00e1 limpa!" },
+  "settings": { "message": "Configura\u00e7\u00f5es" },
+
+  "contextMenuCopyClean": { "message": "Copiar URL limpa" },
+  "contextMenuCopyCleanCurrent": { "message": "Copiar URL limpa da p\u00e1gina" },
+  "copiedToClipboard": { "message": "URL limpa copiada!" },
+
+  "optionsTitle": { "message": "Configura\u00e7\u00f5es do Link Cleaner" },
+  "optionsSubtitle": { "message": "Gerenciar remo\u00e7\u00e3o de par\u00e2metros de rastreamento" },
+
+  "statsTitle": { "message": "Estat\u00edsticas" },
+  "statsTotal": { "message": "Total removido" },
+  "statsSession": { "message": "Esta sess\u00e3o" },
+  "statsDomains": { "message": "Dom\u00ednios limpos" },
+  "statsTopDomains": { "message": "Principais dom\u00ednios" },
+  "statsEmpty": { "message": "Sem dados ainda" },
+  "statsReset": { "message": "Redefinir estat\u00edsticas" },
+
+  "customParamsTitle": { "message": "Par\u00e2metros personalizados" },
+  "customParamsDesc": { "message": "Adicionar par\u00e2metros de rastreamento adicionais para remover." },
+  "defaultParamsTitle": { "message": "Par\u00e2metros padr\u00e3o (integrados)" },
+  "add": { "message": "Adicionar" },
+
+  "whitelistTitle": { "message": "Dom\u00ednios na lista branca" },
+  "whitelistDesc": { "message": "Os par\u00e2metros de rastreamento n\u00e3o ser\u00e3o removidos nestes dom\u00ednios." },
+
+  "notificationsTitle": { "message": "Notifica\u00e7\u00f5es" },
+  "notificationsEnable": { "message": "Mostrar notifica\u00e7\u00f5es" },
+  "notificationType": { "message": "Tipo de notifica\u00e7\u00e3o" },
+  "notifBadge": { "message": "Apenas badge" },
+  "notifToast": { "message": "Apenas toast" },
+  "notifBoth": { "message": "Badge + Toast" },
+
+  "themeTitle": { "message": "Apar\u00eancia" },
+  "themeLabel": { "message": "Tema" },
+  "themeSystem": { "message": "Sistema" },
+  "themeDark": { "message": "Escuro" },
+  "themeLight": { "message": "Claro" },
+
+  "importExportTitle": { "message": "Importar / Exportar" },
+  "importExportDesc": { "message": "Fazer backup ou restaurar suas configura\u00e7\u00f5es." },
+  "exportBtn": { "message": "Exportar configura\u00e7\u00f5es" },
+  "importBtn": { "message": "Importar configura\u00e7\u00f5es" }
+}
