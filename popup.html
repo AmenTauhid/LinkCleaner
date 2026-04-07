@@ -2,24 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="popup.css">
 </head>
-<body>
+<body data-theme="system">
   <div class="container">
     <div class="header">
       <img src="icons/icon48.png" alt="Link Cleaner" class="logo">
-      <h1>Link Cleaner</h1>
+      <h1 data-i18n="extName">Link Cleaner</h1>
     </div>
-    <p class="description">Removes tracking parameters from URLs</p>
+
     <div class="toggle-row">
-      <span id="status-text">Active</span>
+      <span id="status-text" data-i18n="statusActive">Active</span>
       <label class="switch">
         <input type="checkbox" id="toggle" checked>
         <span class="slider"></span>
       </label>
     </div>
-    <div class="info">
-      <p>Cleans: utm_*, fbclid, gclid, msclkid, and 40+ other tracking params</p>
+
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-value" id="session-count">0</span>
+        <span class="stat-label" data-i18n="session">Session</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value" id="total-count">0</span>
+        <span class="stat-label" data-i18n="total">Total</span>
+      </div>
+    </div>
+
+    <button id="clean-current" class="btn-clean" data-i18n="cleanCurrent">Clean Current URL</button>
+
+    <div class="footer">
+      <a href="#" id="open-options" data-i18n="settings">Settings</a>
     </div>
   </div>
   <script src="popup.js"></script>

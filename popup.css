@@ -7,8 +7,8 @@
 body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   width: 280px;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
 }
 
 .container {
@@ -19,7 +19,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
 }
 
 .logo {
@@ -30,20 +30,15 @@ body {
 h1 {
   font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
-.description {
-  font-size: 12px;
-  color: #888;
-  margin-bottom: 16px;
-}
-
+/* Toggle */
 .toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #16213e;
+  background: var(--bg-secondary);
   padding: 12px 16px;
   border-radius: 10px;
   margin-bottom: 12px;
@@ -70,10 +65,7 @@ h1 {
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: #444;
   transition: 0.3s;
   border-radius: 24px;
@@ -92,15 +84,85 @@ h1 {
 }
 
 input:checked + .slider {
-  background-color: #0078d4;
+  background-color: var(--accent);
 }
 
 input:checked + .slider::before {
   transform: translateX(20px);
 }
 
-.info {
+/* Stats */
+.stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--bg-secondary);
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-label {
   font-size: 11px;
-  color: #666;
-  line-height: 1.4;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border);
+}
+
+/* Clean button */
+.btn-clean {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 10px;
+}
+
+.btn-clean:hover {
+  background: var(--accent-hover);
+}
+
+.btn-clean.copied {
+  background: var(--success);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+}
+
+.footer a {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer a:hover {
+  color: var(--accent);
 }
