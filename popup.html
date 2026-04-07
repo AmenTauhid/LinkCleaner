@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="icons/icon48.png" alt="Link Cleaner" class="logo">
+      <h1>Link Cleaner</h1>
+    </div>
+    <p class="description">Removes tracking parameters from URLs</p>
+    <div class="toggle-row">
+      <span id="status-text">Active</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="info">
+      <p>Cleans: utm_*, fbclid, gclid, msclkid, and 40+ other tracking params</p>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
