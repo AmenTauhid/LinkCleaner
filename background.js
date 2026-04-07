@@ -36,6 +36,8 @@ const REDIRECT_DOMAINS = {
 
 const DYNAMIC_RULE_ID = 1;
 const tabCounts = new Map();
+const recentCleans = new Map();  // tabId -> { timestamp, count, domain }
+const pendingToasts = new Map(); // tabId -> { count, domain }
 
 // ─── Initialization ───
 
@@ -109,6 +111,14 @@ async function rebuildRules() {
 chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
   if (details.frameId !== 0) return;
 
+  // If declarativeNetRequest just redirected this tab, skip the second onBeforeNavigate
+  const recent = recentCleans.get(details.tabId);
+  if (recent && Date.now() - recent.timestamp < 3000) return;
+
+  // New navigation: reset badge
+  tabCounts.delete(details.tabId);
+  chrome.action.setBadgeText({ text: "", tabId: details.tabId });
+
   const { enabled, whitelist = [], customParams = [] } =
     await chrome.storage.local.get(["enabled", "whitelist", "customParams"]);
   if (!enabled) return;
@@ -124,6 +134,11 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     }
     if (count === 0) return;
 
+    // Mark this tab as recently cleaned so the redirect doesn't reset it
+    recentCleans.set(details.tabId, {
+      timestamp: Date.now(), count, domain: url.hostname
+    });
+
     // Update persistent stats
     const { stats } = await chrome.storage.local.get({
       stats: { total: 0, session: 0, byDomain: {} }
@@ -134,9 +149,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     await chrome.storage.local.set({ stats });
 
     // Badge counter
-    const prev = tabCounts.get(details.tabId) || 0;
-    tabCounts.set(details.tabId, prev + count);
-    chrome.action.setBadgeText({ text: String(prev + count), tabId: details.tabId });
+    tabCounts.set(details.tabId, count);
+    chrome.action.setBadgeText({ text: String(count), tabId: details.tabId });
 
     // Badge flash
     chrome.action.setBadgeBackgroundColor({ color: "#ff4444", tabId: details.tabId });
@@ -144,27 +158,35 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
       chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
     }, 800);
 
-    // Toast
-    const { showNotifications, notificationType } = await chrome.storage.local.get({
-      showNotifications: true, notificationType: "badge"
-    });
-    if (showNotifications && (notificationType === "toast" || notificationType === "both")) {
-      try {
-        chrome.tabs.sendMessage(details.tabId, {
-          action: "showToast", count, domain: url.hostname
-        });
-      } catch {}
-    }
+    // Queue toast for when the page finishes loading
+    pendingToasts.set(details.tabId, { count, domain: url.hostname });
   } catch {}
 });
 
-chrome.tabs.onRemoved.addListener((tabId) => tabCounts.delete(tabId));
+// Send toast after page loads so the content script is ready
+chrome.webNavigation.onCompleted.addListener(async (details) => {
+  if (details.frameId !== 0) return;
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (changeInfo.status === "loading") {
-    tabCounts.delete(tabId);
-    chrome.action.setBadgeText({ text: "", tabId });
+  const pending = pendingToasts.get(details.tabId);
+  if (!pending) return;
+  pendingToasts.delete(details.tabId);
+
+  const { showNotifications, notificationType } = await chrome.storage.local.get({
+    showNotifications: true, notificationType: "badge"
+  });
+  if (showNotifications && (notificationType === "toast" || notificationType === "both")) {
+    try {
+      chrome.tabs.sendMessage(details.tabId, {
+        action: "showToast", count: pending.count, domain: pending.domain
+      });
+    } catch {}
   }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  tabCounts.delete(tabId);
+  recentCleans.delete(tabId);
+  pendingToasts.delete(tabId);
 });
 
 // ─── Context menu ───
