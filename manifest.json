@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Link Cleaner",
+  "name": "LinkCleaner",
   "version": "2.0.0",
   "description": "Removes tracking parameters from URLs.",
   "permissions": [
