@@ -1,10 +1,8 @@
-// ─── Default tracking parameters ───
-const DEFAULT_PARAMS = [
+const TRACKING_PARAMS = [
   "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
   "utm_cid", "utm_reader", "utm_name", "utm_referrer", "utm_social", "utm_social-type",
   "fbclid", "fb_action_ids", "fb_action_types", "fb_ref", "fb_source",
-  "gclid", "gclsrc",
-  "msclkid",
+  "gclid", "gclsrc", "msclkid",
   "hsa_cam", "hsa_grp", "hsa_mt", "hsa_src", "hsa_ad", "hsa_acc",
   "hsa_net", "hsa_ver", "hsa_la", "hsa_ol", "hsa_kw",
   "mc_cid", "mc_eid",
@@ -15,336 +13,92 @@ const DEFAULT_PARAMS = [
   "vero_id", "nr_email_referer", "mkt_tok"
 ];
 
-// ─── Known redirect wrappers ───
-const REDIRECT_DOMAINS = {
-  "l.facebook.com":      { path: "/l.php",        param: "u" },
-  "lm.facebook.com":     { path: "/l.php",        param: "u" },
-  "www.google.com":      { path: "/url",           param: "q" },
-  "www.google.co.uk":    { path: "/url",           param: "q" },
-  "www.google.ca":       { path: "/url",           param: "q" },
-  "www.google.de":       { path: "/url",           param: "q" },
-  "www.google.fr":       { path: "/url",           param: "q" },
-  "click.linksynergy.com": { param: "murl" },
-  "redirect.viglink.com":  { param: "u" },
-  "steamcommunity.com":  { path: "/linkfilter/",   param: "url" },
-  "exit.sc":             { param: "url" },
-  "slack-redir.net":     { path: "/link",          param: "url" },
-  "href.li":             { param: null },
-  "t.umblr.com":         { path: "/redirect",      param: "z" },
-  "out.reddit.com":      { param: "url" },
-};
+const recentCleans = new Map();
 
-const DYNAMIC_RULE_ID = 1;
-const tabCounts = new Map();
-const recentCleans = new Map();  // tabId -> { timestamp, count, domain }
-const pendingToasts = new Map(); // tabId -> { count, domain }
+// ─── Setup ───
 
-// ─── Initialization ───
-
-chrome.runtime.onInstalled.addListener(async () => {
-  await chrome.declarativeNetRequest.updateEnabledRulesets({
-    disableRulesetIds: ["tracking_rules"]
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get({ enabled: true }, ({ enabled }) => {
+    if (!enabled) disableRules();
   });
-  await rebuildRules();
-  setupContextMenu();
-
-  const defaults = {
-    enabled: true,
-    customParams: [],
-    whitelist: [],
-    stats: { total: 0, session: 0, byDomain: {} },
-    showNotifications: true,
-    notificationType: "badge",
-    theme: "system"
-  };
-  const existing = await chrome.storage.local.get(Object.keys(defaults));
-  const merged = { ...defaults, ...existing };
-  await chrome.storage.local.set(merged);
+  chrome.contextMenus.create({
+    id: "copy-clean-url",
+    title: "Copy clean URL",
+    contexts: ["link", "page"]
+  });
 });
 
-chrome.runtime.onStartup.addListener(async () => {
-  await rebuildRules();
-  setupContextMenu();
-  const { stats } = await chrome.storage.local.get({
-    stats: { total: 0, session: 0, byDomain: {} }
-  });
-  stats.session = 0;
-  await chrome.storage.local.set({ stats });
-});
-
-// ─── Dynamic rule management ───
-
-async function rebuildRules() {
-  const { enabled, customParams = [], whitelist = [] } =
-    await chrome.storage.local.get(["enabled", "customParams", "whitelist"]);
-
-  if (enabled === false) {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [DYNAMIC_RULE_ID]
-    });
-    return;
-  }
-
-  const allParams = [...DEFAULT_PARAMS, ...customParams];
-  const rule = {
-    id: DYNAMIC_RULE_ID,
-    priority: 1,
-    action: {
-      type: "redirect",
-      redirect: { transform: { queryTransform: { removeParams: allParams } } }
-    },
-    condition: { resourceTypes: ["main_frame", "sub_frame"] }
-  };
-
-  if (whitelist.length > 0) {
-    rule.condition.excludedRequestDomains = whitelist;
-  }
-
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [DYNAMIC_RULE_ID],
-    addRules: [rule]
-  });
-}
-
-// ─── Stats tracking ───
+// ─── Badge counter ───
 
 chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
   if (details.frameId !== 0) return;
 
-  // If declarativeNetRequest just redirected this tab, skip the second onBeforeNavigate
   const recent = recentCleans.get(details.tabId);
-  if (recent && Date.now() - recent.timestamp < 3000) return;
+  if (recent && Date.now() - recent < 3000) return;
 
-  // New navigation: reset badge
-  tabCounts.delete(details.tabId);
   chrome.action.setBadgeText({ text: "", tabId: details.tabId });
 
-  const { enabled, whitelist = [], customParams = [] } =
-    await chrome.storage.local.get(["enabled", "whitelist", "customParams"]);
+  const { enabled } = await chrome.storage.local.get({ enabled: true });
   if (!enabled) return;
 
   try {
     const url = new URL(details.url);
-    if (whitelist.some(d => url.hostname === d || url.hostname.endsWith("." + d))) return;
-
-    const allParams = [...DEFAULT_PARAMS, ...customParams];
     let count = 0;
-    for (const p of allParams) {
+    for (const p of TRACKING_PARAMS) {
       if (url.searchParams.has(p)) count++;
     }
     if (count === 0) return;
 
-    // Mark this tab as recently cleaned so the redirect doesn't reset it
-    recentCleans.set(details.tabId, {
-      timestamp: Date.now(), count, domain: url.hostname
-    });
-
-    // Update persistent stats
-    const { stats } = await chrome.storage.local.get({
-      stats: { total: 0, session: 0, byDomain: {} }
-    });
-    stats.total += count;
-    stats.session += count;
-    stats.byDomain[url.hostname] = (stats.byDomain[url.hostname] || 0) + count;
-    await chrome.storage.local.set({ stats });
-
-    // Badge counter
-    tabCounts.set(details.tabId, count);
+    recentCleans.set(details.tabId, Date.now());
     chrome.action.setBadgeText({ text: String(count), tabId: details.tabId });
-
-    // Badge flash
-    chrome.action.setBadgeBackgroundColor({ color: "#ff4444", tabId: details.tabId });
-    setTimeout(() => {
-      chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
-    }, 800);
-
-    // Queue toast for when the page finishes loading
-    pendingToasts.set(details.tabId, { count, domain: url.hostname });
+    chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
   } catch {}
 });
 
-// Send toast after page loads so the content script is ready
-chrome.webNavigation.onCompleted.addListener(async (details) => {
-  if (details.frameId !== 0) return;
-
-  const pending = pendingToasts.get(details.tabId);
-  if (!pending) return;
-  pendingToasts.delete(details.tabId);
-
-  const { showNotifications, notificationType } = await chrome.storage.local.get({
-    showNotifications: true, notificationType: "badge"
-  });
-  if (showNotifications && (notificationType === "toast" || notificationType === "both")) {
-    try {
-      chrome.tabs.sendMessage(details.tabId, {
-        action: "showToast", count: pending.count, domain: pending.domain
-      });
-    } catch {}
-  }
-});
-
-chrome.tabs.onRemoved.addListener((tabId) => {
-  tabCounts.delete(tabId);
-  recentCleans.delete(tabId);
-  pendingToasts.delete(tabId);
-});
+chrome.tabs.onRemoved.addListener((tabId) => recentCleans.delete(tabId));
 
 // ─── Context menu ───
 
-function setupContextMenu() {
-  chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: "copy-clean-url",
-      title: chrome.i18n.getMessage("contextMenuCopyClean") || "Copy Clean URL",
-      contexts: ["link"]
-    });
-    chrome.contextMenus.create({
-      id: "copy-clean-current",
-      title: chrome.i18n.getMessage("contextMenuCopyCleanCurrent") || "Copy Clean Page URL",
-      contexts: ["page"]
-    });
-  });
-}
-
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  const raw = info.menuItemId === "copy-clean-url" ? info.linkUrl : info.pageUrl;
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  const raw = info.linkUrl || info.pageUrl;
   if (!raw) return;
 
-  const { customParams = [] } = await chrome.storage.local.get(["customParams"]);
-  const clean = cleanURL(raw, customParams);
-
   try {
-    await chrome.tabs.sendMessage(tab.id, { action: "copyToClipboard", text: clean });
-  } catch {
+    const url = new URL(raw);
+    for (const p of TRACKING_PARAMS) url.searchParams.delete(p);
+    const clean = url.toString();
+
     chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: (text) => navigator.clipboard.writeText(text),
       args: [clean]
     });
-  }
+  } catch {}
 });
 
-// ─── URL cleaning ───
+// ─── Toggle ───
 
-function cleanURL(urlString, customParams = []) {
-  try {
-    let url = new URL(urlString);
-    const unwrapped = unwrapRedirect(url);
-    if (unwrapped) url = new URL(unwrapped);
-
-    const allParams = [...DEFAULT_PARAMS, ...customParams];
-    for (const p of allParams) url.searchParams.delete(p);
-    return url.toString();
-  } catch {
-    return urlString;
-  }
+function enableRules() {
+  chrome.declarativeNetRequest.updateEnabledRulesets({ enableRulesetIds: ["tracking_rules"] });
+  chrome.action.setIcon({
+    path: { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
+  });
 }
 
-function unwrapRedirect(url) {
-  const cfg = REDIRECT_DOMAINS[url.hostname];
-  if (!cfg) return null;
-  if (cfg.path && !url.pathname.startsWith(cfg.path)) return null;
-
-  if (cfg.param === null) {
-    // href.li style: destination is the path
-    const dest = url.pathname.substring(1) + url.search;
-    return dest.startsWith("http") ? dest : null;
-  }
-
-  const dest = url.searchParams.get(cfg.param);
-  if (!dest) return null;
-  try { return decodeURIComponent(dest); } catch { return dest; }
+function disableRules() {
+  chrome.declarativeNetRequest.updateEnabledRulesets({ disableRulesetIds: ["tracking_rules"] });
+  chrome.action.setIcon({
+    path: { "16": "icons/icon16-off.png", "48": "icons/icon48-off.png", "128": "icons/icon128-off.png" }
+  });
 }
 
-// ─── Message handling ───
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  switch (message.action) {
-    case "toggle":
-      handleToggle(message.enabled).then(() => sendResponse({ success: true }));
-      return true;
-
-    case "getStatus":
-      chrome.storage.local.get({
-        enabled: true,
-        stats: { total: 0, session: 0, byDomain: {} },
-        theme: "system"
-      }, sendResponse);
-      return true;
-
-    case "getDefaultParams":
-      sendResponse({ params: DEFAULT_PARAMS });
-      return;
-
-    case "getSettings":
-      chrome.storage.local.get({
-        enabled: true, customParams: [], whitelist: [],
-        stats: { total: 0, session: 0, byDomain: {} },
-        showNotifications: true, notificationType: "badge", theme: "system"
-      }, (data) => {
-        data.defaultParams = DEFAULT_PARAMS;
-        sendResponse(data);
-      });
-      return true;
-
-    case "updateSettings":
-      chrome.storage.local.set(message.settings, async () => {
-        await rebuildRules();
-        sendResponse({ success: true });
-      });
-      return true;
-
-    case "resetStats":
-      chrome.storage.local.set({
-        stats: { total: 0, session: 0, byDomain: {} }
-      }, () => sendResponse({ success: true }));
-      return true;
-
-    case "exportSettings":
-      chrome.storage.local.get({
-        customParams: [], whitelist: [],
-        showNotifications: true, notificationType: "badge", theme: "system"
-      }, (data) => sendResponse({ data }));
-      return true;
-
-    case "importSettings":
-      const d = message.data;
-      chrome.storage.local.set({
-        customParams: d.customParams || [],
-        whitelist: d.whitelist || [],
-        showNotifications: d.showNotifications !== undefined ? d.showNotifications : true,
-        notificationType: d.notificationType || "badge",
-        theme: d.theme || "system"
-      }, async () => {
-        await rebuildRules();
-        sendResponse({ success: true });
-      });
-      return true;
-
-    case "cleanURL":
-      chrome.storage.local.get({ customParams: [] }, ({ customParams }) => {
-        sendResponse({ url: cleanURL(message.url, customParams) });
-      });
-      return true;
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === "toggle") {
+    msg.enabled ? enableRules() : disableRules();
+    chrome.storage.local.set({ enabled: msg.enabled });
+  }
+  if (msg.action === "getStatus") {
+    chrome.storage.local.get({ enabled: true }, sendResponse);
+    return true;
   }
 });
-
-async function handleToggle(enabled) {
-  await chrome.storage.local.set({ enabled });
-
-  if (enabled) {
-    await rebuildRules();
-    chrome.action.setIcon({
-      path: { "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png" }
-    });
-  } else {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [DYNAMIC_RULE_ID]
-    });
-    chrome.action.setIcon({
-      path: { "16": "icons/icon16-off.png", "48": "icons/icon48-off.png", "128": "icons/icon128-off.png" }
-    });
-    const tabs = await chrome.tabs.query({});
-    for (const t of tabs) chrome.action.setBadgeText({ text: "", tabId: t.id });
-  }
-}
