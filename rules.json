@@ -60,7 +60,8 @@
               "ef_id",
               "vero_id",
               "nr_email_referer",
-              "mkt_tok"
+              "mkt_tok",
+              "source"
             ]
           }
         }
