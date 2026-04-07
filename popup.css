@@ -3,15 +3,11 @@
 body {
   font-family: "Segoe UI", system-ui, sans-serif;
   width: 260px;
-  background: transparent;
+  background: #1c1c1c;
   color: #ccc;
 }
 
-.popup {
-  padding: 14px;
-  background: #1c1c1c;
-  border-radius: 12px;
-}
+.popup { padding: 14px; }
 
 /* Header */
 .header {
