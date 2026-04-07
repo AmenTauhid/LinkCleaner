@@ -61,7 +61,8 @@
               "vero_id",
               "nr_email_referer",
               "mkt_tok",
-              "source"
+              "source",
+              "gh_src"
             ]
           }
         }

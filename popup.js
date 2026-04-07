@@ -10,7 +10,7 @@ const TRACKING_PARAMS = [
   "igshid", "si", "ref", "ref_src", "ref_url",
   "yclid", "twclid", "ttclid", "dclid",
   "soc_src", "soc_trk", "s_kwcid", "ef_id",
-  "vero_id", "nr_email_referer", "mkt_tok", "source"
+  "vero_id", "nr_email_referer", "mkt_tok", "source", "gh_src"
 ];
 
 const power = document.getElementById("power");
