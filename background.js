@@ -14,6 +14,13 @@ const TRACKING_PARAMS = [
 ];
 
 const recentCleans = new Map();
+let isEnabled = true;
+
+// Keep enabled state cached in memory so listeners stay synchronous
+chrome.storage.local.get({ enabled: true }, ({ enabled }) => { isEnabled = enabled; });
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.enabled) isEnabled = changes.enabled.newValue;
+});
 
 // ─── Setup ───
 
@@ -29,17 +36,17 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // ─── Badge counter ───
+// Fully synchronous — no awaits, so the redirect's second onBeforeNavigate
+// can't race and clear the badge before we set it.
 
-chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
+chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   if (details.frameId !== 0) return;
 
+  // Skip the redirect's second fire
   const recent = recentCleans.get(details.tabId);
   if (recent && Date.now() - recent < 3000) return;
 
-  chrome.action.setBadgeText({ text: "", tabId: details.tabId });
-
-  const { enabled } = await chrome.storage.local.get({ enabled: true });
-  if (!enabled) return;
+  if (!isEnabled) return;
 
   try {
     const url = new URL(details.url);
@@ -49,13 +56,17 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     }
     if (count === 0) return;
 
+    // Mark immediately so the redirect's onBeforeNavigate is blocked
     recentCleans.set(details.tabId, Date.now());
+
+    // Set badge synchronously
     chrome.action.setBadgeText({ text: String(count), tabId: details.tabId });
     chrome.action.setBadgeBackgroundColor({ color: "#0078d4", tabId: details.tabId });
 
-    // Persist total
-    const { totalCleaned = 0 } = await chrome.storage.local.get({ totalCleaned: 0 });
-    chrome.storage.local.set({ totalCleaned: totalCleaned + count });
+    // Persist total (fire and forget)
+    chrome.storage.local.get({ totalCleaned: 0 }, ({ totalCleaned }) => {
+      chrome.storage.local.set({ totalCleaned: totalCleaned + count });
+    });
   } catch {}
 });
 
